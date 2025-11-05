@@ -75,17 +75,23 @@
                     // bar.style.width = '0%';
                     setTimeout(() => {
                         bar.style.transition = '';
-                        window.location = url;
+                        console.log(clickCount +"in popup");
+                        if( clickCount <4){ // if the count is < 4, you will see only progress bar, > 4 you will see progress bar followed by capcha
+                            window.location = url;
+                        }
+                        else{
+                            $('#pbar').hide();
+                            $('#capcha').css('display','block');
+                        }
+
                     }, 0);
                 }
             }
-            if( clickCount < 5 ){
-                requestAnimationFrame(animate);
-            }
-            else{
-                $('#pbar').hide();
-                $('#capcha').css('display','block');
-            }
+            requestAnimationFrame(animate);                        
+            // else{
+            //     $('#pbar').hide();
+            //     $('#capcha').css('display','block');
+            // }
 
             $('#submit').click(function(){
                  window.location = url;
