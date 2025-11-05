@@ -16,7 +16,7 @@ function handleUrlRequests(){
     var articleTitle = $.trim($(this).text());
     var articleUrl = $(this).attr('href');
     var popupWithParams = popupUrl + '?clickCount=' + encodeURIComponent(clickCount) + '&url=' + encodeURIComponent(articleUrl);
-    if( clickCount >= 3 ){
+    if( clickCount >= 3 ){ //if clickCount is more than 3 , the popup will show a progress bar. change here to adjust the click count
         window.open(popupWithParams, popupName, features);
     }
     else{
