@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <style>
+        .captcha-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 300px;
+        }
+        img {
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background: linear-gradient(90deg,#0072C6,#33c3f0);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+        
+    </head>
+    <body>
+        <div id="pbar">
+            <div id="" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+            <div style="background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); max-width: 500px; text-align: center;">
+                <h2>Stop ! Wait !</h2>
+                <p>Thats way too many requests from you</p>
+                <div style="margin: 30px 0;"></div>
+                    <div id="progressBarContainer2" style="width: 100%; background: #eee; border-radius: 8px; overflow: hidden; height: 24px;">
+                        <div id="progressBar2" style="width: 0%; height: 100%; background: linear-gradient(90deg,#0072C6,#33c3f0); transition: width 0.2s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="capcha" style="text-align: center;width:300px;margin:0 auto;display:none;">
+            <div class="captcha-box">
+                <h2>Enter CAPTCHA</h2>
+                <img src="captcha.png" alt="CAPTCHA Image" height="100"><br>                
+                <input type="text" name="captcha_input" placeholder="Type the text you see"><br>
+                <button id="submit" type="button">Submit</button>            
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript" src="./wl-demo_files/jquery.js.download"></script>
+    <script>
+        $(function(){
+
+            var qs = new URLSearchParams(location.search);
+            var url = qs.get('url');
+            var clickCount = qs.get('clickCount');
+
+            var bar = document.getElementById('progressBar2');
+            var duration = 1000; // 3 seconds
+            var start = null;
+            function animate(ts) {
+                if (!start) start = ts;
+                var progress = Math.min((ts - start) / (duration * (clickCount * clickCount)), 1); //scale the click count accordingly - cube, quadraple to slow down the bar
+                bar.style.width = (progress * 100) + '%';
+                if (progress < 1) requestAnimationFrame(animate);
+                if (progress >= 1) {
+                    // bar.style.transition = 'none';
+                    // bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.transition = '';
+                        window.location = url;
+                    }, 0);
+                }
+            }
+            if( clickCount < 5 ){
+                requestAnimationFrame(animate);
+            }
+            else{
+                $('#pbar').hide();
+                $('#capcha').css('display','block');
+            }
+
+            $('#submit').click(function(){
+                 window.location = url;
+            });
+            
+        });
+    </script>
+</html>
