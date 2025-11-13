@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Alert System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+            color:#535353;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        li{ list-style-type: none;}
+
+        #map-background {
+            width: 100%;
+            height: 100%;
+            background-image: url('map.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: popIn 0.3s ease-out;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .marker.detected {
+            background-color: #de4e19;
+            border: 3px solid #df0808;
+        }
+
+        .marker.active {
+            background-color: #b58905;
+            border: 3px solid #F57C00;
+            animation: pulse 1s infinite;
+        }
+
+        .marker.neutralized {
+            background-color: #0ded51;
+            border: 3px solid #059b28;
+        }
+
+        #attack-log {
+            position: fixed;
+            bottom: 0px;
+            left: 10px;
+            width: 100%;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        li{
+            font-size: 13px;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="map-background">
+        
+    <div id="attack-log"> 
+        <ul id="items" style="overflow-y: auto; height: 100%; list-style-position: inside;"></ul>
+
+        </ul>
+    </div>
+    </div>
+
+    <script>
+        // const SPAWN_INTERVAL = 7000; // milliseconds between new markers
+        // const STATE_CHANGE_INTERVAL = 12000; // milliseconds between state changes
+
+        const SPAWN_INTERVAL = Math.floor(Math.random() * (15000 - 7000 + 1)) + 3000;
+        const STATE_CHANGE_INTERVAL = Math.floor(Math.random() * (8000 - 3000 + 1)) + 3000;
+        let locationIndex = 0;
+
+        let markers = [];
+
+        var coordinates = [
+            { lat: 63.17784952794872, long: 29.045586286531066, location: "Crescent Valley High" },
+            { lat: 29.51310427937155, long: 59.683520771219065, location: "Golden Gate Market" },
+            { lat: 90.81524886337569, long: 49.91977286950602, location: "Aurora Art & History Museum" },
+            { lat: 28.98716765968038, long: 45.76000277215242, location: "Oakridge Municipal Hall" },
+            { lat: 8.371951174736814, long: 47.55166889820314, location: "Riverbend Knowledge Center" },
+            { lat: 40.915775504882454, long: 32.49934027974898, location: "Keystone Savings & Loan" },
+            { lat: 3.3650898871323554, long: 24.845771687499496, location: "Silverleaf Public Library" },
+            { lat: 27.487891230312123, long: 27.86842876002754, location: "Summit Trade Centre" },
+            { lat: 26.268294556686943, long: 78.79959111213655, location: "Horizon Technical Institute" },
+            { lat: 13.643415663720216, long: 98.52218736790893, location: "Coastal Maritime Museum" }
+        ];
+
+        var attacks = [
+            { name: 'DDOS Attack', tag: 'DOS' },
+            { name: 'Ransomware Attack', tag: 'RAN' },
+            { name: 'Phishing Attack', tag: 'PHI' },
+            { name: 'DNS Spoofing Attack', tag: 'DNS' },
+            { name: 'Bruteforce Attack', tag: 'BRT' },
+            { name: 'Man in the Middle Attack', tag: 'MIM' }
+        ];
+
+        var states = [
+            'detected',
+            'active',
+            'neutralized'
+        ]
+
+        class Marker {
+            constructor() {
+
+                this.currentLocation = coordinates[locationIndex];
+                this.attack = attacks[Math.floor(Math.random() * attacks.length)];
+
+
+                this.element = document.createElement('div');
+                
+                this.element.className = 'marker detected';
+                this.element.innerHTML = '<div style="font-size: 11px; color: white; display: flex; align-items: center; justify-content: center; height: 100%;">' + this.attack.tag + '</div>';
+                this.stateIndex = 0;
+                // this.x = Math.random() * 100;
+                // this.y = Math.random() * 100;
+                
+                this.x = this.currentLocation.lat;
+                this.y = this.currentLocation.long;
+                
+                this.element.style.left = this.x + '%';
+                this.element.style.top = this.y + '%';
+                
+                document.getElementById('map-background').appendChild(this.element);
+                
+                this.stateTimer = setInterval(() => this.changeState( this.currentLocation), STATE_CHANGE_INTERVAL);
+                this.logAttact( this.currentLocation );
+                console.log(locationIndex);
+            }
+
+            changeState() { 
+                this.stateIndex = (this.stateIndex + 1) % states.length;
+                this.element.className = 'marker ' + states[this.stateIndex];
+                this.logAttact();
+            }
+
+            destroy() {
+                clearInterval(this.stateTimer);
+                this.element.remove();
+            }
+
+            logAttact(){
+                let timestamp = new Date();
+                let dd = String(timestamp.getDate()).padStart(2, '0');
+                let MM = String(timestamp.getMonth() + 1).padStart(2, '0');
+                let yyyy = timestamp.getFullYear();
+                let HH = String(timestamp.getHours()).padStart(2, '0');
+                let mm = String(timestamp.getMinutes()).padStart(2, '0');
+                let ss = String(timestamp.getSeconds()).padStart(2, '0');
+                timestamp = dd + '-' + MM + '-' + yyyy + ' ' + HH + ':' + mm + ':' + ss;
+                let logText = '<li>[' + timestamp + '] <b>' + this.attack.name + ' </b>' + states[this.stateIndex].toUpperCase() + ' at ' + this.currentLocation.location + '</li>';
+                document.getElementById('items').insertAdjacentHTML('beforeend', logText);
+                document.getElementById('items').scrollTop = document.getElementById('items').scrollHeight;
+            }
+        }
+
+        function spawnMarker() {
+            const marker = new Marker();
+            markers.push(marker);
+             ++locationIndex;
+            if (locationIndex >= coordinates.length) {
+                locationIndex = 0;
+            }
+        }
+
+        // Spawn markers at regular intervals
+        setInterval(() => {
+            spawnMarker();
+           
+        }, SPAWN_INTERVAL);
+        
+        // Spawn first marker immediately.
+        spawnMarker();
+    </script>
+</body>
+</html>
