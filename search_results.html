@@ -18,6 +18,9 @@
 
 <script>
     var clickCount = 0;
+    // setTimeout(() => updateRiskMeter(3), 500);
+    // setTimeout(() => updateRiskMeter(6), 1500);
+    // setTimeout(() => updateRiskMeter(8), 2500);
 </script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.setAttributeNode(d.createAttribute('data-ot-ignore'));j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NLR6H6W');</script>
@@ -176,7 +179,65 @@ var g_SPOffSwitches={};
         }
     });
 </script>
-<style type="text/css">
+<style>
+    .risk-o-meter-widget {
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin: 10px 0;
+    }
+
+    .risk-meter {
+        position: relative;
+        height: 30px;
+        margin-bottom: 10px;
+    }
+
+    .risk-meter-bar {
+        display: flex;
+        height: 100%;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .risk-level {
+        flex: 1;
+    }
+
+    .risk-low {
+        background: #4caf50;
+    }
+
+    .risk-medium {
+        background: #ff9800;
+    }
+
+    .risk-high {
+        background: #f44336;
+    }
+
+    .risk-indicator {
+        position: absolute;
+        top: -7px;
+        transform: translateX(5px);
+    }
+
+    .risk-pointer {
+        font-size: 20px;
+        color: #333;
+    }
+
+    .risk-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    .risk-score {
+        text-align: center;
+        font-size: 14px;
+    }
 	.ctl00_ctl30_g_3e59ddb2_821c_45f2_8a16_6a9672a5d882_ctl00_searchFacetsControl_anatomicalAreaTreeViewControl_0 { text-decoration:none; }
 	.ctl00_ctl30_g_3e59ddb2_821c_45f2_8a16_6a9672a5d882_ctl00_searchFacetsControl_proceduresTreeViewControl_0 { text-decoration:none; }
 
@@ -1648,7 +1709,29 @@ Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManager', 'aspnetForm',
                 <div class="searchFacets">
 						
 
-
+<div class="filterSection">
+    <h3>Risk Assessment</h3>
+    <div class="risk-o-meter-widget">
+        <div class="risk-meter">
+            <div class="risk-meter-bar">
+                <div class="risk-level risk-low"></div>
+                <div class="risk-level risk-medium"></div>
+                <div class="risk-level risk-high"></div>
+            </div>
+            <div class="risk-indicator" id="riskIndicator" style="left: 0%; transition: left 0.5s ease-in-out;">
+                <span class="risk-pointer">▼</span>
+            </div>
+        </div>
+        <div class="risk-labels">
+            <span class="risk-label">Low</span>
+            <span class="risk-label">Medium</span>
+            <span class="risk-label">High</span>
+        </div>
+        <div class="risk-score">
+            <strong>Risk Score: <span id="riskValue">0</span>/10</strong>
+        </div>
+    </div>
+</div>
 
 <div class="filterResults">
     <h2>
